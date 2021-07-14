@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const config = require('config');
 
-const items = require('./routes/api/items')
 
 const app = express();
 
@@ -10,18 +10,23 @@ app.use(express.json());
 
 //DB config
 
-const db = require('./config/db').mongoURI;
+const db = config.get('mongoURI');
 
 //Connect to Mongo
 mongoose
-    .connect(db)
+    .connect(db, {
+        useNewUrlParser: true,
+        useCreateIndex: true
+    })
     .then(() => { console.log("mongodb connected !!!") })
     .catch(err => console.log(err));
 
 
 //Use Routes
 
-app.use('/api/items', items);
+app.use('/api/items', require('./routes/api/items'));
+app.use('/api/users', require('./routes/api/users'));
+app.use('/api/auth', require('./routes/api/auth'));
 
 //Serve static asset if in production
 
